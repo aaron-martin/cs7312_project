@@ -1,12 +1,12 @@
 import { createSelector } from "reselect";
 
 const selectMeetings = (state) => state.meetings;
-const selectSchedule = (state) => state.schedule;
+const selectScheduleItems = (state) => state.schedule.items;
 const selectTimeSlot = (_, timeSlot) => timeSlot;
 const selectMeetingId = (_, meetingId) => meetingId;
 
 export const selectMeetingsForTimeBlock = createSelector(
-    [selectMeetings, selectSchedule, selectTimeSlot],
+    [selectMeetings, selectScheduleItems, selectTimeSlot],
     (meetings, schedule, timeSlot) => {
         const scheduledMeetings = schedule
             .filter((entry) => entry.time === timeSlot.time && entry.day === timeSlot.day);
@@ -42,7 +42,7 @@ const timeToMinutes = (timeString) => {
 };
 
 export const selectOverlapPlaceholderCount = createSelector(
-    [selectMeetings, selectSchedule, selectTimeSlot],
+    [selectMeetings, selectScheduleItems, selectTimeSlot],
     (meetings, schedule, timeSlot) => {
         const currentTime = timeToMinutes(timeSlot.time);
 

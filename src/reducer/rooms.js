@@ -4,7 +4,7 @@ const initialState = {
             id: "1",
             name: "Willow Wing",
             description: "Best for small team huddles and quiet planning.",
-            maxOccupancy: 30,
+            maxOccupancy: 50,
             zone: "Robin"
         },
         {
@@ -68,7 +68,7 @@ const initialState = {
             id: "10",
             name: "Birch Meadow",
             description: "Useful for medium meetings and collaborative sessions.",
-            maxOccupancy: 50,
+            maxOccupancy: 100,
             zone: "Lark"
         },
 
@@ -83,14 +83,14 @@ const initialState = {
             id: "12",
             name: "Aspen Brook",
             description: "Ideal for group planning and routine presentations.",
-            maxOccupancy: 50,
+            maxOccupancy: 30,
             zone: "Wren"
         },
         {
             id: "13",
             name: "Pebble Finch",
             description: "Great for meetings with a moderate group size.",
-            maxOccupancy: 50,
+            maxOccupancy: 30,
             zone: "Wren"
         },
         {
@@ -119,7 +119,7 @@ const initialState = {
             id: "17",
             name: "Willow Peak",
             description: "Ideal for all-hands meetings and expanded workshops.",
-            maxOccupancy: 100,
+            maxOccupancy: 50,
             zone: "Nightingale"
         },
         {

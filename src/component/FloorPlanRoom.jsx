@@ -72,7 +72,7 @@ const FloorPlanRoom = ({roomId}) => {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
-            <div style={styles.roomName}>{room.name}</div>
+            <div style={styles.roomName}>{`${room.name} (${room.zone})`}</div>
             <div style={styles.roomMeta}>Capacity: {room.maxOccupancy}</div>
             <div style={styles.roomDescription}>{room.description}</div>
             <FloorPlanScheduledMeeting scheduledMeeting={scheduledMeeting}/>

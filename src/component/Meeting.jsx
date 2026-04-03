@@ -1,9 +1,12 @@
 import React from "react";
 import {useSelector} from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import {selectRoomByMeetingId, selectTimeSlotForMeeting} from "../selectors/selectTimeBlockMeetings.js";
 import {FLOOR_PLAN_PANEL, PLANNER_PANEL} from "../reducer/activePanel.js";
 
 const Meeting = ({meeting}) => {
+    const navigate = useNavigate();
     const timeSlot = useSelector((state) => selectTimeSlotForMeeting(state, meeting.id));
     const location = useSelector((state) => selectRoomByMeetingId(state, meeting.id));
     const activeView = useSelector((state) => state.settings.activePanel);
@@ -46,6 +49,13 @@ const Meeting = ({meeting}) => {
                     <strong>Room:</strong> {`${location.name} ${location.zone}`}
                 </div>
             )}
+            <button
+                type="button"
+                onClick={() => navigate(`/meeting/edit/${meeting.id}`)}
+                style={styles.button}
+            >
+                Edit
+            </button>
         </div>
     );
 }
@@ -57,8 +67,12 @@ const styles = {
         padding: "0.75rem",
         marginBottom: "0.75rem",
         background: "#fafafa"
+    },
+    button: {
+        marginTop: "0.75rem",
+        padding: "0.5rem 0.75rem",
+        cursor: "pointer"
     }
-
 };
 
 export default Meeting;

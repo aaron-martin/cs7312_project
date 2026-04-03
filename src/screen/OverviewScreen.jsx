@@ -16,11 +16,11 @@ const OverviewScreen = () => {
 
             <div style={styles.layout}>
                 <section style={styles.listPanel}>
-                    <h2 style={styles.sectionTitle}>Classes</h2>
+                    <h2 style={styles.sectionTitle}>Meetings</h2>
 
                     <div style={styles.scrollList}>
                         {meetings.length === 0 ? (
-                            <p style={styles.emptyText}>No classes added yet.</p>
+                            <p style={styles.emptyText}>No meetings added yet.</p>
                         ) : (
                             meetings.map((meeting) => (
                                 <Meeting key={meeting.id} meeting={meeting} />

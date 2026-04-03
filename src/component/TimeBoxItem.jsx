@@ -35,12 +35,13 @@ const TimeBoxItem = ({scheduledMeeting}) => {
                 </button>
             </div>
             <div><strong>{scheduledMeeting.name}</strong></div>
-            <div>{scheduledMeeting.description}</div>
             <div style={styles.locationRow}>
-                <strong>room:</strong>
-                {scheduledMeeting.roomId &&
-                   <span>{scheduledMeeting.roomName}</span>
-                }
+                <span style={styles.locationName}>
+                    <strong>room:</strong>
+                    {scheduledMeeting.roomId &&
+                       <span>{scheduledMeeting.roomName}</span>
+                    }
+                </span>
                 <button type="button" onClick={openModal}>+</button>
             </div>
         </div>
@@ -58,16 +59,23 @@ const styles = {
         zIndex: 99,
     },
     deleteButtonContainer: {
-        display: "flex",
-        justifyContent: "flex-end",
-        flexDirection: "row",
+        float: "right",
+        right: "90px",
+        width: "1.25rem",
     },
     deleteButton: {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "1.25rem",
+        height: "1.25rem",
+        padding: 0,
         background: "transparent",
         cursor: "pointer",
         fontWeight: "bold",
         lineHeight: 1,
-        borderWidth: 0,
+        border: "none",
+        borderRadius: "50%"
     },
     locationRow: {
         display: "flex",
@@ -76,5 +84,11 @@ const styles = {
         flexWrap: "wrap",
         gap: "0.5rem",
         wordBreak: "break-word"
+    },
+    locationName: {
+        maxWidth: "70%",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap"
     }
 };

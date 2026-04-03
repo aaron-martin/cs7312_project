@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import {createMeeting} from "../action/meetings.js";
+import { useParams } from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {createMeeting, updateMeeting} from "../action/meetings.js";
+import {selectMeetingById} from "../selectors/selectTimeBlockMeetings.js";
 
 const MeetingForm = () => {
     const dispatch = useDispatch();
+    const { id } = useParams();
+    const meetingToEdit = useSelector((state) => selectMeetingById(state, id));
 
     const [formData, setFormData] = useState({
         name: "",
@@ -11,6 +15,24 @@ const MeetingForm = () => {
         duration: "",
         numAttendees: ""
     });
+
+    React.useEffect(() => {
+        if (meetingToEdit) {
+            setFormData({
+                name: meetingToEdit.name ?? "",
+                description: meetingToEdit.description ?? "",
+                duration: meetingToEdit.duration ?? "",
+                numAttendees: meetingToEdit.numAttendees ?? ""
+            });
+        } else {
+            setFormData({
+                name: "",
+                description: "",
+                duration: "",
+                numAttendees: ""
+            });
+        }
+    }, [meetingToEdit]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -24,13 +46,19 @@ const MeetingForm = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        dispatch(createMeeting({
-            id: crypto.randomUUID(),
+        const payload = {
+            id: meetingToEdit?.id ?? crypto.randomUUID(),
             name: formData.name,
             description: formData.description,
             duration: Number(formData.duration),
             numAttendees: Number(formData.numAttendees)
-        }));
+        };
+
+        if (meetingToEdit) {
+            dispatch(updateMeeting(payload));
+        } else {
+            dispatch(createMeeting(payload));
+        }
 
         setFormData({
             name: "",
@@ -42,7 +70,7 @@ const MeetingForm = () => {
 
     return (
         <div style={styles.page}>
-            <h1>Meeting Form</h1>
+            <h1>{meetingToEdit ? "Edit Meeting" : "Meeting Form"}</h1>
 
             <form onSubmit={handleSubmit} style={styles.form}>
                 <label style={styles.label}>
@@ -96,7 +124,7 @@ const MeetingForm = () => {
                 </label>
 
                 <button type="submit" style={styles.button}>
-                    Add Meeting
+                    {meetingToEdit ? "Update Meeting" : "Add Meeting"}
                 </button>
             </form>
         </div>

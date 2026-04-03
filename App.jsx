@@ -13,6 +13,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<OverviewScreen />} />
                 <Route path="/meeting" element={<MeetingForm />} />
+                <Route path="/meeting/edit/:id" element={<MeetingForm />} />
             </Routes>
         </BrowserRouter>
     );

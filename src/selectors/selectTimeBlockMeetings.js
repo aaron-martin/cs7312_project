@@ -11,6 +11,7 @@ const selectFloorPlanDayTime = (state) => state.settings.floorPlanDayTime;
 
 export const selectRoomById = (state, roomId) => state.rooms.items.find((item) => item.id === roomId);
 export const scheduledItemById = (state, scheduledId) => state.schedule.items.find((item) => item.id === scheduledId);
+export const selectMeetingById = (state, meetingId) => state.meetings.find((item) => item.id === meetingId);
 
 export const selectMeetingsForTimeBlock = createSelector(
     [selectMeetings, selectScheduleItems, selectRooms, selectTimeSlot],

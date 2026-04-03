@@ -2,20 +2,26 @@ import { createSelector } from "reselect";
 
 const selectMeetings = (state) => state.meetings;
 const selectScheduleItems = (state) => state.schedule.items;
+const selectRooms = (state) => state.rooms.items;
 const selectTimeSlot = (_, timeSlot) => timeSlot;
 const selectMeetingId = (_, meetingId) => meetingId;
+const selectRoomId = (_, roomId) => roomId;
+const selectLocationModalSetting = (state) => state.settings.addLocationModalSetting;
 
 export const selectMeetingsForTimeBlock = createSelector(
-    [selectMeetings, selectScheduleItems, selectTimeSlot],
-    (meetings, schedule, timeSlot) => {
+    [selectMeetings, selectScheduleItems, selectRooms, selectTimeSlot],
+    (meetings, schedule, rooms, timeSlot) => {
         const scheduledMeetings = schedule
             .filter((entry) => entry.time === timeSlot.time && entry.day === timeSlot.day);
 
         return scheduledMeetings.reduce((acc, entry) => {
             const meeting = meetings.find((m) => m.id === entry.meetingId);
+            const room = rooms.find((r) => r.id === entry.roomId) || {};
             if (meeting) {
                 acc.push({
                     ...meeting,
+                    roomId: room.id,
+                    roomName: `${room.name} (${room.zone})`,
                     time: entry.time,
                     day: entry.day,
                     scheduleId: entry.id
@@ -72,5 +78,128 @@ export const selectOverlapPlaceholderCount = createSelector(
         });
 
         return overlappingMeetings.length;
+    }
+);
+
+export const selectTimeSlotForMeeting = createSelector(
+    [selectScheduleItems, selectMeetingId],
+    (scheduleItems, meetingId) => {
+        const scheduledEntry = scheduleItems.find(
+            (entry) => entry.meetingId === meetingId
+        );
+
+        if (!scheduledEntry) {
+            return null;
+        }
+
+        return {
+            time: scheduledEntry.time,
+            day: scheduledEntry.day
+        };
+    }
+);
+
+export const selectRoomByMeetingId = createSelector(
+    [selectScheduleItems, selectRooms, selectMeetingId],
+    (scheduleItems, rooms, meetingId) => {
+        const scheduledEntry = scheduleItems.find((entry) => entry.meetingId === meetingId);
+
+        if (!scheduledEntry) {
+            return null;
+        }
+
+        const room = rooms.find((entry) => entry.id === scheduledEntry.roomId);
+
+        if (!room) {
+            return null;
+        }
+
+        return {
+            name: room.name,
+            zone: room.zone
+        };
+    }
+);
+
+export const selectScheduleItemByOpenModal = createSelector(
+    [selectScheduleItems, selectLocationModalSetting],
+    (scheduleItems, scheduleId) => {
+        if (!scheduleId) {
+            return null;
+        }
+        return scheduleItems.find((entry) => entry.id === scheduleId);
+    }
+)
+
+export const selectAvailableRoomsForModal = createSelector(
+    [selectMeetings, selectScheduleItems, selectRooms, selectScheduleItemByOpenModal],
+    (meetings, scheduleItems, rooms, scheduleItem) => {
+        if (!scheduleItem) {
+            return []
+        }
+
+        const selectedMeeting = meetings.find((meeting) => meeting.id === scheduleItem.meetingId);
+        if (!selectedMeeting) {
+            return [];
+        }
+
+        const slotStart = timeToMinutes(scheduleItem.time);
+        const slotEnd = slotStart + selectedMeeting.duration;
+
+        const isOverlapping = (room) => {
+            return scheduleItems.some((entry) => {
+                if (entry.roomId !== room.id ) {
+                    return false;
+                }
+                const entryMeeting = meetings.find((m) => m.id === entry.meetingId);
+                if (!entryMeeting) {
+                    return false;
+                }
+                const entryMeetingStart = timeToMinutes(entry.time);
+                const entryMeetingEnd = entryMeetingStart + entryMeeting.duration;
+
+                return entryMeetingStart >= slotStart && entryMeetingStart < slotEnd ||
+                    entryMeetingEnd > slotStart && entryMeetingEnd <= slotEnd;
+            });
+        };
+
+        return rooms.filter((room) => {
+            if (selectedMeeting.numAttendees > room.maxOccupancy) {
+                return false;
+            }
+
+            return !isOverlapping(room);
+        });
+    }
+);
+
+export const selectRoomByOpenModal = createSelector(
+    [selectScheduleItems, selectRooms, selectScheduleItemByOpenModal],
+    (scheduledItem, rooms, scheduledEntry) => {
+        if (!scheduledEntry) {
+            return null;
+        }
+
+        if (!scheduledEntry || !scheduledEntry.roomId) {
+            return null;
+        }
+
+        const room = rooms.find((entry) => entry.id === scheduledEntry.roomId);
+
+        return {
+            name: room.name,
+            zone: room.zone
+        };
+    }
+);
+
+export const selectMeetingByOpenModal = createSelector(
+    [selectScheduleItems, selectMeetings, selectScheduleItemByOpenModal],
+    (scheduledItem, meetings, scheduledEntry) => {
+        if (!scheduledEntry) {
+            return null;
+        }
+
+        return meetings.find((entry) => entry.id === scheduledEntry.meetingId);
     }
 );

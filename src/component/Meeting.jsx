@@ -1,17 +1,26 @@
 import React from "react";
 import {useSelector} from "react-redux";
 import {selectRoomByMeetingId, selectTimeSlotForMeeting} from "../selectors/selectTimeBlockMeetings.js";
+import {FLOOR_PLAN_PANEL, PLANNER_PANEL} from "../reducer/activePanel.js";
 
 const Meeting = ({meeting}) => {
     const timeSlot = useSelector((state) => selectTimeSlotForMeeting(state, meeting.id));
     const location = useSelector((state) => selectRoomByMeetingId(state, meeting.id));
+    const activeView = useSelector((state) => state.settings.activePanel);
     const handleDragStart = (event) => {
-        event.dataTransfer.setData("text/plain", JSON.stringify({meetingId: meeting.id}));
+        event.dataTransfer.setData(
+            "text/plain",
+            JSON.stringify({
+                meetingId: meeting.id,
+                scheduleId: timeSlot?.scheduleId
+            })
+        );
         event.dataTransfer.effectAllowed = "move";
     };
+
     return (
         <div
-            draggable
+            draggable={!(activeView === PLANNER_PANEL && !!timeSlot || activeView === FLOOR_PLAN_PANEL && !!location)}
             key={meeting.id} style={styles.card}
             onDragStart={handleDragStart}
         >
@@ -23,6 +32,9 @@ const Meeting = ({meeting}) => {
             </div>
             <div>
                 <strong>Duration:</strong> {meeting.duration}
+            </div>
+            <div>
+                <strong>Expected Attendance:</strong> {meeting.numAttendees}
             </div>
             {timeSlot && (
                 <div>

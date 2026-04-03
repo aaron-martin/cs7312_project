@@ -7,6 +7,9 @@ const selectTimeSlot = (_, timeSlot) => timeSlot;
 const selectMeetingId = (_, meetingId) => meetingId;
 const selectRoomId = (_, roomId) => roomId;
 const selectLocationModalSetting = (state) => state.settings.addLocationModalSetting;
+const selectFloorPlanDayTime = (state) => state.settings.floorPlanDayTime;
+
+export const selectRoomById = (state, roomId) => state.rooms.items.find((item) => item.id === roomId);
 
 export const selectMeetingsForTimeBlock = createSelector(
     [selectMeetings, selectScheduleItems, selectRooms, selectTimeSlot],
@@ -201,5 +204,91 @@ export const selectMeetingByOpenModal = createSelector(
         }
 
         return meetings.find((entry) => entry.id === scheduledEntry.meetingId);
+    }
+);
+
+export const canScheduleMeetingInRoom = (state, meetingId, roomId) => {
+    const newMeeting = state.meetings.find((item) => item.id === meetingId);
+    const room = state.rooms.items.find((item) => item.id === roomId);
+    const {
+        day,
+        time
+    } = selectFloorPlanDayTime(state);
+    const scheduledItems = selectScheduleItems(state);
+
+    if (!newMeeting || !room) {
+        return false;
+    }
+
+    // capacity check
+    if (newMeeting.numAttendees && newMeeting.numAttendees > room.maxOccupancy) {
+        return false;
+    }
+
+    // simple schedule conflict check
+    const newStart = timeToMinutes(time);
+    const newEnd = newStart + newMeeting.duration;
+
+    const overlaps = scheduledItems.some((entry) => {
+        if (entry.roomId !== roomId || entry.day !== day) {
+            return false;
+        }
+
+        const existingMeeting = state.meetings.find((item) => item.id === entry.meetingId);
+        if (!existingMeeting) {
+            return false;
+        }
+
+        const existingStart = timeToMinutes(entry.time);
+        const existingEnd = existingStart + existingMeeting.duration;
+
+        return newStart < existingEnd && newEnd > existingStart;
+    });
+
+    return !overlaps;
+};
+
+export const selectMeetingInRoomAtSelectedTime = createSelector(
+    [selectMeetings, selectScheduleItems, selectRooms, selectFloorPlanDayTime, selectRoomId],
+    (meetings, scheduleItems, rooms, timeSlot, roomId) => {
+        if (!timeSlot || !roomId) {
+            return null;
+        }
+
+        const currentTime = timeToMinutes(timeSlot.time);
+        const currentDay = timeSlot.day;
+
+        const scheduledEntry = scheduleItems.find((entry) => {
+            if (entry.roomId !== roomId || entry.day !== currentDay) {
+                return false;
+            }
+
+            const meeting = meetings.find((item) => item.id === entry.meetingId);
+            if (!meeting) {
+                return false;
+            }
+
+            const start = timeToMinutes(entry.time);
+            const end = start + meeting.duration;
+
+            return currentTime >= start && currentTime < end;
+        });
+
+        if (!scheduledEntry) {
+            return null;
+        }
+
+        const meeting = meetings.find((item) => item.id === scheduledEntry.meetingId);
+
+        if (!meeting) {
+            return null;
+        }
+
+        return {
+            ...meeting,
+            time: scheduledEntry.time,
+            day: scheduledEntry.day,
+            scheduleId: scheduledEntry.id
+        };
     }
 );

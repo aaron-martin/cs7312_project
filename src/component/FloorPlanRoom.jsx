@@ -1,20 +1,81 @@
 import React from "react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
+import {
+    canScheduleMeetingInRoom,
+    selectMeetingInRoomAtSelectedTime,
+    selectRoomById
+} from "../selectors/selectTimeBlockMeetings.js";
+import {rescheduleMeeting, scheduleMeeting} from "../action/scheduling.js";
+import FloorPlanScheduledMeeting from "./FloorPlanScheduledMeeting.jsx";
 
 const FloorPlanRoom = ({roomId}) => {
-    const room = useSelector((state) =>
-        state.rooms.items.find((item) => item.id === roomId)
-    );
+    const store = useStore();
+    const [isDragValid, setIsDragValid] = React.useState(false);
+    const dispatch = useDispatch();
+    const room = useSelector((state) => selectRoomById(state, roomId));
+    const scheduledMeeting = useSelector((state) => selectMeetingInRoomAtSelectedTime(state, roomId));
+
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        if (scheduledMeeting) return;
+
+        const {
+            meetingId,
+            scheduleId
+        } =  JSON.parse(event.dataTransfer.getData("text/plain"));
+
+        const state = store.getState();
+
+        const canAccept = canScheduleMeetingInRoom(
+            state,
+            meetingId,
+            roomId
+        );
+
+        if (!canAccept) {
+            console.log("Meeting cannot be placed in this room.");
+            return;
+        }
+
+        if (scheduleId) {
+            dispatch(rescheduleMeeting({
+                id: crypto.randomUUID(),
+                meetingId,
+                scheduleId,
+                roomId,
+                time: state.settings.floorPlanDayTime.time,
+                day: state.settings.floorPlanDayTime.day,
+            }));
+            return
+        }
+
+        dispatch(scheduleMeeting({
+            id: crypto.randomUUID(),
+            meetingId,
+            roomId,
+            time: state.settings.floorPlanDayTime.time,
+            day: state.settings.floorPlanDayTime.day,
+        }));
+    };
 
     if (!room) {
         return <div style={styles.roomCard}>Unknown room</div>;
     }
 
     return (
-        <div style={styles.roomCard}>
+        <div
+            style={styles.roomCard}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+        >
             <div style={styles.roomName}>{room.name}</div>
             <div style={styles.roomMeta}>Capacity: {room.maxOccupancy}</div>
             <div style={styles.roomDescription}>{room.description}</div>
+            <FloorPlanScheduledMeeting scheduledMeeting={scheduledMeeting}/>
         </div>
     );
 };
@@ -26,7 +87,8 @@ const styles = {
         padding: "0.75rem",
         background: "#f7fbff",
         minHeight: "110px",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
+        transition: "background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease"
     },
     roomName: {
         fontWeight: "bold",

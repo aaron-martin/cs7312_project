@@ -32,11 +32,15 @@ function schedule(state = initialState, action) {
                 ],
                 items: state.items.reduce((acc, entry) => {
                     if (entry.id === action.payload.scheduleId) {
-                        acc.push({
+                        const next = {
                             ...entry,
                             time: action.payload.time,
                             day: action.payload.day
-                        });
+                        }
+                        if (action.payload.roomId) {
+                            next.roomId = action.payload.roomId;
+                        }
+                        acc.push(next);
                     } else {
                         acc.push(entry);
                     }

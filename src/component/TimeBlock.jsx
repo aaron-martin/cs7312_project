@@ -19,7 +19,7 @@ const TimeBlock = ({time, day}) => {
             scheduleId
         } = JSON.parse(String(event.dataTransfer.getData("text/plain")));
 
-        if (scheduleId && scheduleId) {
+        if (scheduleId && meetingId) {
             dispatch(rescheduleMeeting({
                 scheduleId,
                 time,

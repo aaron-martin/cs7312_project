@@ -1,6 +1,7 @@
 import React from "react";
 import {useDispatch} from "react-redux";
 import {deleteScheduleMeeting} from "../action/scheduling.js";
+import {openAddLocationModal} from "../action/settings.js";
 
 const PX_PER_15_MINUTES = 40;
 
@@ -17,9 +18,11 @@ const TimeBoxItem = ({scheduledMeeting}) => {
         event.stopPropagation();
         dispatch(deleteScheduleMeeting(scheduledMeeting.scheduleId));
     };
-    console.log('unites', scheduledMeeting.duration, scheduledMeeting.duration / 15);
+    const openModal = (event) => {
+        event.stopPropagation();
+        dispatch(openAddLocationModal(scheduledMeeting.scheduleId));
+    }
     const height = (scheduledMeeting.duration / 15) * PX_PER_15_MINUTES;
-    console.log('height', height);
     return (
         <div
             draggable
@@ -33,6 +36,13 @@ const TimeBoxItem = ({scheduledMeeting}) => {
             </div>
             <div><strong>{scheduledMeeting.name}</strong></div>
             <div>{scheduledMeeting.description}</div>
+            <div style={styles.locationRow}>
+                <strong>room:</strong>
+                {scheduledMeeting.roomId &&
+                   <span>{scheduledMeeting.roomName}</span>
+                }
+                <button type="button" onClick={openModal}>+</button>
+            </div>
         </div>
     )
 }
@@ -58,5 +68,13 @@ const styles = {
         fontWeight: "bold",
         lineHeight: 1,
         borderWidth: 0,
+    },
+    locationRow: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "0.5rem",
+        wordBreak: "break-word"
     }
 };

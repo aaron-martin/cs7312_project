@@ -1,7 +1,7 @@
 import {
     SCHEDULE_MEETING,
     RESCHEDULE_MEETING,
-    DELETE_SCHEDULE_MEETING
+    DELETE_SCHEDULE_MEETING, UPDATE_MEETING_LOCATION
 } from "../action/actionTypes.js";
 
 const initialState = {
@@ -36,6 +36,24 @@ function schedule(state = initialState, action) {
                             ...entry,
                             time: action.payload.time,
                             day: action.payload.day
+                        });
+                    } else {
+                        acc.push(entry);
+                    }
+                    return acc;
+                }, [])
+            }
+        case UPDATE_MEETING_LOCATION:
+            return {
+                prevItems: [
+                    state.items.map((item) => ({...item})),
+                    ...state.prevItems
+                ],
+                items: state.items.reduce((acc, entry) => {
+                    if (entry.id === action.payload.scheduleId) {
+                        acc.push({
+                            ...entry,
+                            roomId: action.payload.roomId
                         });
                     } else {
                         acc.push(entry);

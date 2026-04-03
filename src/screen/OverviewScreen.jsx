@@ -2,9 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Meeting from "../component/Meeting.jsx";
 import {PlannerPanel} from "../component/PlannerPanel.jsx";
+import PanelToggle from "../component/PanelToggle.jsx";
+import {FLOOR_PLAN_PANEL} from "../reducer/activePanel.js";
+import FloorPlanPanel from "../component/FloorPlanPanel.jsx";
 
 const OverviewScreen = () => {
     const meetings = useSelector((state) => state.meetings);
+    const activeView = useSelector((state) => state.settings.activePanel)
 
     return (
         <div style={styles.page}>
@@ -26,7 +30,8 @@ const OverviewScreen = () => {
                 </section>
 
                 <section style={styles.plannerPanel}>
-                    <PlannerPanel />
+                    <PanelToggle/>
+                    {activeView === FLOOR_PLAN_PANEL ? <FloorPlanPanel/> : <PlannerPanel />}
                 </section>
             </div>
         </div>

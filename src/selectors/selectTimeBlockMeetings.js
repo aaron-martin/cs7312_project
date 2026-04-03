@@ -10,6 +10,7 @@ const selectLocationModalSetting = (state) => state.settings.addLocationModalSet
 const selectFloorPlanDayTime = (state) => state.settings.floorPlanDayTime;
 
 export const selectRoomById = (state, roomId) => state.rooms.items.find((item) => item.id === roomId);
+export const scheduledItemById = (state, scheduledId) => state.schedule.items.find((item) => item.id === scheduledId);
 
 export const selectMeetingsForTimeBlock = createSelector(
     [selectMeetings, selectScheduleItems, selectRooms, selectTimeSlot],
@@ -96,6 +97,7 @@ export const selectTimeSlotForMeeting = createSelector(
         }
 
         return {
+            scheduleId: scheduledEntry.id,
             time: scheduledEntry.time,
             day: scheduledEntry.day
         };
@@ -207,7 +209,7 @@ export const selectMeetingByOpenModal = createSelector(
     }
 );
 
-export const canScheduleMeetingInRoom = (state, meetingId, roomId) => {
+export const canScheduleMeetingInRoom = (state, meetingId, roomId, scheduleId) => {
     const newMeeting = state.meetings.find((item) => item.id === meetingId);
     const room = state.rooms.items.find((item) => item.id === roomId);
     const {
@@ -215,8 +217,14 @@ export const canScheduleMeetingInRoom = (state, meetingId, roomId) => {
         time
     } = selectFloorPlanDayTime(state);
     const scheduledItems = selectScheduleItems(state);
+    const scheduledItem = scheduledItemById(state, scheduleId);
+    const floorPlanDayTime = selectFloorPlanDayTime(state);
 
     if (!newMeeting || !room) {
+        return false;
+    }
+
+    if (scheduledItem && (scheduledItem.time !== floorPlanDayTime.time || scheduledItem.day !== floorPlanDayTime.day)) {
         return false;
     }
 

@@ -10,7 +10,6 @@ import FloorPlanScheduledMeeting from "./FloorPlanScheduledMeeting.jsx";
 
 const FloorPlanRoom = ({roomId}) => {
     const store = useStore();
-    const [isDragValid, setIsDragValid] = React.useState(false);
     const dispatch = useDispatch();
     const room = useSelector((state) => selectRoomById(state, roomId));
     const scheduledMeeting = useSelector((state) => selectMeetingInRoomAtSelectedTime(state, roomId));
@@ -33,7 +32,8 @@ const FloorPlanRoom = ({roomId}) => {
         const canAccept = canScheduleMeetingInRoom(
             state,
             meetingId,
-            roomId
+            roomId,
+            scheduleId
         );
 
         if (!canAccept) {

@@ -36,14 +36,18 @@ const TimeBoxItem = ({scheduledMeeting}) => {
             </div>
             <div><strong>{scheduledMeeting.name}</strong></div>
             <div style={styles.locationRow}>
-                <span style={styles.locationName}>
-                    <strong>room:</strong>
-                    {scheduledMeeting.roomId &&
-                       <span>{scheduledMeeting.roomName}</span>
-                    }
+                <span>
+                    <strong>room: </strong>
+                    {scheduledMeeting.roomId ? scheduledMeeting.roomName : ""}
                 </span>
-                <button type="button" onClick={openModal}>+</button>
             </div>
+            <button
+                style={styles.addRoomButton}
+                type="button"
+                onClick={openModal}
+            >
+                {scheduledMeeting.roomId ? "Edit Room" : "Add Room"}
+            </button>
         </div>
     )
 }
@@ -51,6 +55,7 @@ export default TimeBoxItem;
 
 const styles = {
     item: {
+        position: "relative",
         width: "120px",
         borderRadius: "6px",
         background: "#dfefff",
@@ -79,16 +84,35 @@ const styles = {
     },
     locationRow: {
         display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "0.5rem",
-        wordBreak: "break-word"
+        flexDirection: "column",
+        alignItems: "stretch",
+        gap: "0.15rem",
+        width: "100%",
+        minWidth: 0
+    },
+    locationLabel: {
+        whiteSpace: "nowrap"
     },
     locationName: {
-        maxWidth: "70%",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
+        width: "100%",
+        minWidth: 0,
+        whiteSpace: "normal",
+        overflowWrap: "anywhere",
+        wordBreak: "break-word",
+        lineHeight: 1.2
+    },
+    addRoomButton: {
+        position: "absolute",
+        right: "0.35rem",
+        bottom: "0.35rem",
+        padding: 0,
+        border: "none",
+        background: "transparent",
+        color: "#2563eb",
+        fontSize: "0.75rem",
+        fontWeight: 500,
+        cursor: "pointer",
+        textDecoration: "underline",
+        lineHeight: 1
     }
 };

@@ -29,7 +29,9 @@ const AddLocationModal = () => {
         <div style={styles.backdrop}>
             <div style={styles.modal}>
                 <div style={styles.header}>
-                    <h3 style={styles.title}>Add / Update Location</h3>
+                    <h3 style={styles.title}>
+                        {currentRoom ? "Update Room" : "Add Room"}
+                    </h3>
                     <button
                         type="button"
                         style={styles.closeButton}
@@ -51,6 +53,10 @@ const AddLocationModal = () => {
                 </div>
 
                 <div style={styles.roomList}>
+                    <div style={styles.roomListTitle}>Available Rooms:</div>
+                    {availableRooms.length === 0 && (
+                        <div style={styles.emptyState}>No rooms available</div>
+                    )}
                     {availableRooms.map((room) => {
                         const isCurrentRoom = currentRoom && room.name === currentRoom.name;
 
@@ -135,6 +141,22 @@ const styles = {
     roomList: {
         display: "grid",
         gap: "0.75rem"
+    },
+    roomListTitle: {
+        fontSize: "0.95rem",
+        fontWeight: 700,
+        color: "#1f2937",
+        letterSpacing: "0.02em",
+        textTransform: "uppercase",
+        marginBottom: "0.25rem"
+    },
+    emptyState: {
+        padding: "0.85rem 1rem",
+        borderRadius: "8px",
+        backgroundColor: "#f8fafc",
+        border: "1px dashed #cbd5e1",
+        color: "#64748b",
+        fontStyle: "italic"
     },
     roomCard: {
         textAlign: "left",

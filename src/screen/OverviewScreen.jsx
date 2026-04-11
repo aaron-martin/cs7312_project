@@ -4,7 +4,7 @@ import Meeting from "../component/Meeting.jsx";
 import {PlannerPanel} from "../component/PlannerPanel.jsx";
 import PanelToggle from "../component/PanelToggle.jsx";
 import {FLOOR_PLAN_PANEL} from "../reducer/activePanel.js";
-import FloorPlanPanel from "../component/FloorPlanPanel.jsx";
+import FloorPlanPanel from "../component/FloorPlanPanelReal.jsx";
 
 const OverviewScreen = () => {
     const meetings = useSelector((state) => state.meetings);
@@ -56,7 +56,9 @@ const styles = {
         border: "1px solid #ccc",
         borderRadius: "8px",
         padding: "1rem",
-        background: "#fff"
+        background: "#fff",
+        position: "sticky",
+        top: "1rem"
     },
     plannerPanel: {
         border: "1px solid #ccc",
@@ -69,7 +71,7 @@ const styles = {
         marginBottom: "0.75rem"
     },
     scrollList: {
-        maxHeight: "500px",
+        maxHeight: "calc(100vh - 160px) ",
         overflowY: "auto",
         paddingRight: "0.25rem"
     },

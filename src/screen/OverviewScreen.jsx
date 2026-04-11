@@ -4,7 +4,7 @@ import Meeting from "../component/Meeting.jsx";
 import {PlannerPanel} from "../component/PlannerPanel.jsx";
 import PanelToggle from "../component/PanelToggle.jsx";
 import {FLOOR_PLAN_PANEL} from "../reducer/activePanel.js";
-import FloorPlanPanel from "../component/FloorPlanPanel.jsx";
+import FloorPlanPanel from "../component/FloorPlanPanelReal.jsx";
 
 const OverviewScreen = () => {
     const meetings = useSelector((state) => state.meetings);

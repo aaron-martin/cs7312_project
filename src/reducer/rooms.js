@@ -25,7 +25,7 @@ const initialState = {
             id: "4",
             name: "Meadow Chime",
             description: "Works well for small presentations and quick reviews.",
-            maxOccupancy: 30,
+            maxOccupancy: 50,
             zone: "Robin"
         },
         {
@@ -97,7 +97,7 @@ const initialState = {
             id: "14",
             name: "River Thicket",
             description: "Best for active collaboration and mid-size sessions.",
-            maxOccupancy: 50,
+            maxOccupancy: 30,
             zone: "Wren"
         },
         {

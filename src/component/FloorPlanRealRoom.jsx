@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {
     canScheduleMeetingInRoom,
@@ -8,18 +8,29 @@ import {
 import {rescheduleMeeting, scheduleMeeting} from "../action/scheduling.js";
 import FloorPlanScheduledMeeting from "./FloorPlanScheduledMeeting.jsx";
 
-const FloorPlanRoom = ({roomId}) => {
+const FloorPlanRoom = ({roomId, top, left, width}) => {
     const store = useStore();
     const dispatch = useDispatch();
     const room = useSelector((state) => selectRoomById(state, roomId));
     const scheduledMeeting = useSelector((state) => selectMeetingInRoomAtSelectedTime(state, roomId));
+    const [isDragOver, setIsDragOver] = useState(false);
 
+    const handleDragEnter = (event) => {
+        event.preventDefault();
+        setIsDragOver(true);
+    };
     const handleDragOver = (event) => {
         event.preventDefault();
+        setIsDragOver(true);
+    };
+    const handleDragLeave = () => {
+        setIsDragOver(false);
     };
 
     const handleDrop = (event) => {
         event.preventDefault();
+        setIsDragOver(false);
+
         if (scheduledMeeting) return;
 
         const {
@@ -67,42 +78,74 @@ const FloorPlanRoom = ({roomId}) => {
     }
 
     return (
-        <div
-            style={styles.roomCard}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-        >
-            <div style={styles.roomName}>{`${room.name} (${room.zone})`}</div>
-            <div style={styles.roomMeta}>Capacity: {room.maxOccupancy}</div>
-            <div style={styles.roomDescription}>{room.description}</div>
-            <FloorPlanScheduledMeeting scheduledMeeting={scheduledMeeting}/>
+        <div style={{
+            ...styles.roomCardWrapper,
+            top: `${top}px`,
+            left: `${left}px`,
+            width: width? `${width}px` : undefined
+        }}>
+            <div
+                style={styles.roomCard}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
+                <div style={styles.roomName}>
+                    <span style={styles.roomNameSpan}>{`${room.name} (${room.zone})`}</span>
+                </div>
+                <div style={styles.roomMeta}>Capacity: {room.maxOccupancy}</div>
+                <div style={styles.roomDescription}>{room.description}</div>
+                <FloorPlanScheduledMeeting scheduledMeeting={scheduledMeeting}/>
+            </div>
+            {isDragOver && <div style={styles.roomCardHover} />}
         </div>
     );
 };
 
 const styles = {
+    roomCardWrapper: {
+        position: "absolute",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
     roomCard: {
-        border: "1px solid #a8c8e8",
-        borderRadius: "8px",
-        padding: "0.75rem",
-        background: "#f7fbff",
+        background: "transparent",
         minHeight: "110px",
         boxSizing: "border-box",
         transition: "background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease"
     },
     roomName: {
         fontWeight: "bold",
-        marginBottom: "0.35rem"
+        marginBottom: "0.35rem",
+        textAlign: "center",
+    },
+    roomNameSpan: {
+        background: "white"
     },
     roomMeta: {
         fontSize: "0.85rem",
-        color: "#444"
+        color: "#444",
+        background: "white",
+        width: "fit-content"
     },
     roomDescription: {
         marginTop: "0.5rem",
         fontSize: "0.8rem",
-        color: "#555"
-    }
+        color: "#555",
+        background: "white",
+        width: "fit-content"
+    },
+    roomCardHover: {
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+        borderRadius: "12px",
+        background: "radial-gradient(circle, rgba(91,141,239,0.35) 0%, rgba(91,141,239,0.18) 35%, rgba(91,141,239,0.06) 60%, rgba(91,141,239,0) 100%)",
+        boxShadow: "0 0 18px rgba(91,141,239,0.45), inset 0 0 18px rgba(91,141,239,0.25)"
+    },
 };
 
 export default FloorPlanRoom;

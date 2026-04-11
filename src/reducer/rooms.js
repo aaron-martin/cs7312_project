@@ -136,8 +136,7 @@ const initialState = {
             maxOccupancy: 600,
             zone: "Nightingale"
         }
-    ],
-    selectedRoom: null
+    ]
 };
 
 function rooms(state = initialState, action) {

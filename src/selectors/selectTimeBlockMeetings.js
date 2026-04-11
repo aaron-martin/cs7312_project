@@ -1,8 +1,10 @@
 import { createSelector } from "reselect";
 
-const selectMeetings = (state) => state.meetings;
-const selectScheduleItems = (state) => state.schedule.items;
-const selectRooms = (state) => state.rooms.items;
+import { timeToMinutes } from "../helpers/rooms.js";
+
+export const selectMeetings = (state) => state.meetings;
+export const selectScheduleItems = (state) => state.schedule.items;
+export const selectRooms = (state) => state.rooms.items;
 const selectTimeSlot = (_, timeSlot) => timeSlot;
 const selectMeetingId = (_, meetingId) => meetingId;
 const selectRoomId = (_, roomId) => roomId;
@@ -12,6 +14,17 @@ const selectFloorPlanDayTime = (state) => state.settings.floorPlanDayTime;
 export const selectRoomById = (state, roomId) => state.rooms.items.find((item) => item.id === roomId);
 export const scheduledItemById = (state, scheduledId) => state.schedule.items.find((item) => item.id === scheduledId);
 export const selectMeetingById = (state, meetingId) => state.meetings.find((item) => item.id === meetingId);
+export const selectScheduleItemsByMeetingId = (state, meetingId) => {
+    const scheduleItem = state.schedule.items.find((item) => item.meetingId === meetingId);
+    const room = scheduleItem ? selectRoomById(state, scheduleItem.roomId) : null;
+    if (room) {
+        return {
+            ...scheduleItem,
+            roomName: `${room.name} (${room.zone})`
+        }
+    }
+    return scheduleItem;
+}
 
 export const selectMeetingsForTimeBlock = createSelector(
     [selectMeetings, selectScheduleItems, selectRooms, selectTimeSlot],
@@ -36,21 +49,6 @@ export const selectMeetingsForTimeBlock = createSelector(
         }, [])
     }
 );
-
-const timeToMinutes = (timeString) => {
-    const [time, period] = timeString.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
-
-    if (period === "PM" && hours !== 12) {
-        hours += 12;
-    }
-
-    if (period === "AM" && hours === 12) {
-        hours = 0;
-    }
-
-    return hours * 60 + minutes;
-};
 
 export const selectOverlapPlaceholderCount = createSelector(
     [selectMeetings, selectScheduleItems, selectTimeSlot],

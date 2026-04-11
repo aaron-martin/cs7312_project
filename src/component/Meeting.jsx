@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useSelector} from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const Meeting = ({meeting}) => {
     const timeSlot = useSelector((state) => selectTimeSlotForMeeting(state, meeting.id));
     const location = useSelector((state) => selectRoomByMeetingId(state, meeting.id));
     const activeView = useSelector((state) => state.settings.activePanel);
+    const [isHovered, setIsHovered] = useState(false);
     const handleDragStart = (event) => {
         event.dataTransfer.setData(
             "text/plain",
@@ -20,12 +21,20 @@ const Meeting = ({meeting}) => {
         );
         event.dataTransfer.effectAllowed = "move";
     };
+    const isDraggable = !(activeView === PLANNER_PANEL && !!timeSlot || activeView === FLOOR_PLAN_PANEL && !!location)
 
     return (
         <div
-            draggable={!(activeView === PLANNER_PANEL && !!timeSlot || activeView === FLOOR_PLAN_PANEL && !!location)}
-            key={meeting.id} style={styles.card}
+            draggable={isDraggable}
+            key={meeting.id}
+            style={{
+                ...styles.card,
+                ...(isDraggable ? {cursor: "grab"} : {}),
+                ...(isHovered && isDraggable ? styles.cardHover : {})
+            }}
             onDragStart={handleDragStart}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <div>
                 <strong>Name:</strong> {meeting.name}
@@ -66,7 +75,13 @@ const styles = {
         borderRadius: "6px",
         padding: "0.75rem",
         marginBottom: "0.75rem",
-        background: "#fafafa"
+        background: "#fafafa",
+        transition: "transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)"
+    },
+    cardHover: {
+        transform: "translateY(-3px)",
+        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)"
     },
     button: {
         marginTop: "0.75rem",

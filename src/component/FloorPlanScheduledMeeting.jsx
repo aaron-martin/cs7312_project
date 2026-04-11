@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 import { useDispatch } from "react-redux";
 import { deleteScheduleMeeting } from "../action/scheduling.js";
 
 const FloorPlanScheduledMeeting = ({ scheduledMeeting }) => {
     const dispatch = useDispatch();
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleDelete = (event) => {
         event.stopPropagation();
@@ -29,7 +30,12 @@ const FloorPlanScheduledMeeting = ({ scheduledMeeting }) => {
         <div
             draggable
             onDragStart={handleDragStart}
-            style={styles.card}
+            style={{
+                ...styles.card,
+                ...(isHovered ? styles.cardHover : {})
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <div style={styles.header}>
                 <strong>{scheduledMeeting.name}</strong>
@@ -59,6 +65,10 @@ const styles = {
         marginTop: "0.75rem",
         cursor: "grab",
         boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)"
+    },
+    cardHover: {
+        transform: "translateY(-3px)",
+        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)"
     },
     header: {
         display: "flex",

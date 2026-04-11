@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {rescheduleMeeting, scheduleMeeting} from "../action/scheduling.js";
 import {selectMeetingsForTimeBlock, selectOverlapPlaceholderCount} from "../selectors/selectTimeBlockMeetings.js";
@@ -8,12 +8,23 @@ const TimeBlock = ({time, day}) => {
     const scheduledMeetings = useSelector((state) => selectMeetingsForTimeBlock(state, {time, day}));
     const placeHolders = useSelector((state) => selectOverlapPlaceholderCount(state, {time, day}));
     const dispatch = useDispatch();
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const handleDragEnter = (event) => {
+        event.preventDefault();
+        setIsDragOver(true);
+    };
     const handleDragOver = (event) => {
         event.preventDefault();
+        setIsDragOver(true);
+    };
+    const handleDragLeave = () => {
+        setIsDragOver(false);
     };
 
     const handleDrop = (event) => {
         event.preventDefault();
+        setIsDragOver(false);
         const {
             meetingId,
             scheduleId
@@ -41,11 +52,17 @@ const TimeBlock = ({time, day}) => {
     return (
         <div
             style={styles.timeRow}
+            onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
             <div style={styles.timeLabel}>{time}</div>
-            <div style={styles.timeBlock}>
+            <div style={{
+                   ...styles.timeBlock,
+                ...(isDragOver ? styles.timeBlockActive : {})
+                }}
+            >
                 {
                     Array.from({length: placeHolders}).map((_, index) => (<div key={index} style={styles.placeholder}/>))
                 }
@@ -62,7 +79,6 @@ const styles = {
     timeRow: {
         display: "grid",
         gridTemplateColumns: "90px 1fr",
-        // gap: "0.75rem",
         alignItems: "center"
     },
     timeLabel: {
@@ -80,6 +96,10 @@ const styles = {
         alignItems: "flex-start",
         overflow: "visible",
         position: "relative"
+    },
+    timeBlockActive: {
+        background: "#eaf4ff",
+        boxShadow: "inset 0 0 0 2px #5b8def"
     },
     placeholder: {
         width: "120px",

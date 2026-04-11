@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useDispatch} from "react-redux";
 import {deleteScheduleMeeting} from "../action/scheduling.js";
 import {openAddLocationModal} from "../action/settings.js";
@@ -7,6 +7,7 @@ const PX_PER_15_MINUTES = 40;
 
 const TimeBoxItem = ({scheduledMeeting}) => {
     const dispatch = useDispatch();
+    const [isHovered, setIsHovered] = useState(false);
     const handleDragStart = (event) => {
         event.dataTransfer.setData(
             "text/plain",
@@ -26,8 +27,14 @@ const TimeBoxItem = ({scheduledMeeting}) => {
     return (
         <div
             draggable
-            style={{...styles.item, height: `${height}px`}}
+            style={{
+                ...styles.item,
+                height: `${height}px`,
+                ...(isHovered ? styles.itemHover : {})
+            }}
             onDragStart={handleDragStart}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <div style={styles.deleteButtonContainer}>
                 <button type="button" style={styles.deleteButton} onClick={handleDelete}>
@@ -62,6 +69,11 @@ const styles = {
         border: "1px solid #a8c8e8",
         fontSize: "0.85rem",
         zIndex: 99,
+        cursor: "grab",
+    },
+    itemHover: {
+        transform: "translateY(-3px)",
+        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)"
     },
     deleteButtonContainer: {
         float: "right",
